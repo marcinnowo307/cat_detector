@@ -1,0 +1,504 @@
+
+cat_detector.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000236  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000002  00800060  00000236  000002aa  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000002ac  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002dc  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 000000a0  00000000  00000000  00000318  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000953  00000000  00000000  000003b8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000004c7  00000000  00000000  00000d0b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000005b7  00000000  00000000  000011d2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  000000d8  00000000  00000000  0000178c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000003ab  00000000  00000000  00001864  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000002eb  00000000  00000000  00001c0f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000068  00000000  00000000  00001efa  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	79 c0       	rjmp	.+242    	; 0xf8 <__vector_2>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+
+00000014 <__ctors_end>:
+  14:	11 24       	eor	r1, r1
+  16:	1f be       	out	0x3f, r1	; 63
+  18:	cf e9       	ldi	r28, 0x9F	; 159
+  1a:	cd bf       	out	0x3d, r28	; 61
+
+0000001c <__do_copy_data>:
+  1c:	10 e0       	ldi	r17, 0x00	; 0
+  1e:	a0 e6       	ldi	r26, 0x60	; 96
+  20:	b0 e0       	ldi	r27, 0x00	; 0
+  22:	e6 e3       	ldi	r30, 0x36	; 54
+  24:	f2 e0       	ldi	r31, 0x02	; 2
+  26:	02 c0       	rjmp	.+4      	; 0x2c <__do_copy_data+0x10>
+  28:	05 90       	lpm	r0, Z+
+  2a:	0d 92       	st	X+, r0
+  2c:	a2 36       	cpi	r26, 0x62	; 98
+  2e:	b1 07       	cpc	r27, r17
+  30:	d9 f7       	brne	.-10     	; 0x28 <__do_copy_data+0xc>
+  32:	b7 d0       	rcall	.+366    	; 0x1a2 <main>
+  34:	fe c0       	rjmp	.+508    	; 0x232 <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <goToSleep>:
+}
+
+
+void goToSleep()
+{
+	PRR |= (1 << PRTIM0);
+  38:	85 b5       	in	r24, 0x25	; 37
+  3a:	82 60       	ori	r24, 0x02	; 2
+  3c:	85 bd       	out	0x25, r24	; 37
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  3e:	85 b7       	in	r24, 0x35	; 53
+  40:	87 7e       	andi	r24, 0xE7	; 231
+  42:	80 61       	ori	r24, 0x10	; 16
+  44:	85 bf       	out	0x35, r24	; 53
+	cli();
+  46:	f8 94       	cli
+	sleep_enable();
+  48:	85 b7       	in	r24, 0x35	; 53
+  4a:	80 62       	ori	r24, 0x20	; 32
+  4c:	85 bf       	out	0x35, r24	; 53
+	sleep_bod_disable();
+  4e:	80 b7       	in	r24, 0x30	; 48
+  50:	83 60       	ori	r24, 0x03	; 3
+  52:	80 bf       	out	0x30, r24	; 48
+  54:	8e 7f       	andi	r24, 0xFE	; 254
+  56:	80 bf       	out	0x30, r24	; 48
+	sei();
+  58:	78 94       	sei
+	sleep_cpu();
+  5a:	88 95       	sleep
+	sleep_disable();
+  5c:	85 b7       	in	r24, 0x35	; 53
+  5e:	8f 7d       	andi	r24, 0xDF	; 223
+  60:	85 bf       	out	0x35, r24	; 53
+	PRR &= ~(1 << PRTIM0);
+  62:	85 b5       	in	r24, 0x25	; 37
+  64:	8d 7f       	andi	r24, 0xFD	; 253
+  66:	85 bd       	out	0x25, r24	; 37
+  68:	08 95       	ret
+
+0000006a <setBuzzerPwm>:
+}
+
+
+void setBuzzerPwm(configuration * conf)
+{
+	DDRB |= (1 << DDB1);
+  6a:	b9 9a       	sbi	0x17, 1	; 23
+	TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
+  6c:	23 e2       	ldi	r18, 0x23	; 35
+  6e:	2f bd       	out	0x2f, r18	; 47
+	//TCCR0B |= (1 << WGM02);
+	OCR0B  = conf->loudness;
+  70:	fc 01       	movw	r30, r24
+  72:	80 81       	ld	r24, Z
+  74:	89 bd       	out	0x29, r24	; 41
+  76:	08 95       	ret
+
+00000078 <playAlarmSequence>:
+}
+
+
+
+void playAlarmSequence(configuration * conf)
+{
+  78:	fc 01       	movw	r30, r24
+	static uint8_t firstTime = 1;
+	
+	ledOff();
+  7a:	c2 98       	cbi	0x18, 2	; 24
+	buzzOff();
+  7c:	83 b7       	in	r24, 0x33	; 51
+  7e:	88 7f       	andi	r24, 0xF8	; 248
+  80:	83 bf       	out	0x33, r24	; 51
+  82:	12 be       	out	0x32, r1	; 50
+  84:	c1 98       	cbi	0x18, 1	; 24
+	
+	for(uint8_t i = 0; i < conf->reps; i++)
+  86:	81 81       	ldd	r24, Z+1	; 0x01
+  88:	81 11       	cpse	r24, r1
+  8a:	2e c0       	rjmp	.+92     	; 0xe8 <__stack+0x49>
+  8c:	32 c0       	rjmp	.+100    	; 0xf2 <__stack+0x53>
+	{
+		for(uint8_t j = 0; j < conf->blinks_in_one_rep; j++)
+  8e:	20 e0       	ldi	r18, 0x00	; 0
+		{
+			ledOn();
+  90:	c2 9a       	sbi	0x18, 2	; 24
+			if(conf->should_buzz_every_time || firstTime)
+  92:	84 81       	ldd	r24, Z+4	; 0x04
+  94:	81 11       	cpse	r24, r1
+  96:	04 c0       	rjmp	.+8      	; 0xa0 <__stack+0x1>
+  98:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+  9c:	88 23       	and	r24, r24
+  9e:	19 f0       	breq	.+6      	; 0xa6 <__stack+0x7>
+				buzzOn();
+  a0:	93 b7       	in	r25, 0x33	; 51
+  a2:	91 60       	ori	r25, 0x01	; 1
+  a4:	93 bf       	out	0x33, r25	; 51
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  a6:	8f eb       	ldi	r24, 0xBF	; 191
+  a8:	92 e1       	ldi	r25, 0x12	; 18
+  aa:	01 97       	sbiw	r24, 0x01	; 1
+  ac:	f1 f7       	brne	.-4      	; 0xaa <__stack+0xb>
+  ae:	00 c0       	rjmp	.+0      	; 0xb0 <__stack+0x11>
+  b0:	00 00       	nop
+			_delay_ms(150);
+			ledOff();
+  b2:	c2 98       	cbi	0x18, 2	; 24
+			buzzOff();
+  b4:	93 b7       	in	r25, 0x33	; 51
+  b6:	98 7f       	andi	r25, 0xF8	; 248
+  b8:	93 bf       	out	0x33, r25	; 51
+  ba:	12 be       	out	0x32, r1	; 50
+  bc:	c1 98       	cbi	0x18, 1	; 24
+  be:	8f e7       	ldi	r24, 0x7F	; 127
+  c0:	9c e0       	ldi	r25, 0x0C	; 12
+  c2:	01 97       	sbiw	r24, 0x01	; 1
+  c4:	f1 f7       	brne	.-4      	; 0xc2 <__stack+0x23>
+  c6:	00 c0       	rjmp	.+0      	; 0xc8 <__stack+0x29>
+  c8:	00 00       	nop
+	ledOff();
+	buzzOff();
+	
+	for(uint8_t i = 0; i < conf->reps; i++)
+	{
+		for(uint8_t j = 0; j < conf->blinks_in_one_rep; j++)
+  ca:	2f 5f       	subi	r18, 0xFF	; 255
+  cc:	82 81       	ldd	r24, Z+2	; 0x02
+  ce:	28 17       	cp	r18, r24
+  d0:	f8 f2       	brcs	.-66     	; 0x90 <playAlarmSequence+0x18>
+  d2:	8f e7       	ldi	r24, 0x7F	; 127
+  d4:	9e e3       	ldi	r25, 0x3E	; 62
+  d6:	01 97       	sbiw	r24, 0x01	; 1
+  d8:	f1 f7       	brne	.-4      	; 0xd6 <__stack+0x37>
+  da:	00 c0       	rjmp	.+0      	; 0xdc <__stack+0x3d>
+  dc:	00 00       	nop
+	static uint8_t firstTime = 1;
+	
+	ledOff();
+	buzzOff();
+	
+	for(uint8_t i = 0; i < conf->reps; i++)
+  de:	3f 5f       	subi	r19, 0xFF	; 255
+  e0:	81 81       	ldd	r24, Z+1	; 0x01
+  e2:	38 17       	cp	r19, r24
+  e4:	10 f0       	brcs	.+4      	; 0xea <__stack+0x4b>
+  e6:	05 c0       	rjmp	.+10     	; 0xf2 <__stack+0x53>
+  e8:	30 e0       	ldi	r19, 0x00	; 0
+	{
+		for(uint8_t j = 0; j < conf->blinks_in_one_rep; j++)
+  ea:	82 81       	ldd	r24, Z+2	; 0x02
+  ec:	81 11       	cpse	r24, r1
+  ee:	cf cf       	rjmp	.-98     	; 0x8e <playAlarmSequence+0x16>
+  f0:	f0 cf       	rjmp	.-32     	; 0xd2 <__stack+0x33>
+			_delay_ms(100);
+		}
+		_delay_ms(500);
+	}
+	
+	firstTime = 0;	
+  f2:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <__DATA_REGION_ORIGIN__>
+  f6:	08 95       	ret
+
+000000f8 <__vector_2>:
+}
+
+
+
+ISR(PCINT0_vect)
+{
+  f8:	1f 92       	push	r1
+  fa:	0f 92       	push	r0
+  fc:	0f b6       	in	r0, 0x3f	; 63
+  fe:	0f 92       	push	r0
+ 100:	11 24       	eor	r1, r1
+
+}
+ 102:	0f 90       	pop	r0
+ 104:	0f be       	out	0x3f, r0	; 63
+ 106:	0f 90       	pop	r0
+ 108:	1f 90       	pop	r1
+ 10a:	18 95       	reti
+
+0000010c <eeprom_is_fresh>:
+
+// returns 1 if the eeprom needs to be configured with defaults
+uint8_t eeprom_is_fresh()
+{
+	return (eeprom_read_byte((uint8_t *)5) != 0);
+ 10c:	85 e0       	ldi	r24, 0x05	; 5
+ 10e:	90 e0       	ldi	r25, 0x00	; 0
+ 110:	78 d0       	rcall	.+240    	; 0x202 <eeprom_read_byte>
+ 112:	91 e0       	ldi	r25, 0x01	; 1
+ 114:	81 11       	cpse	r24, r1
+ 116:	01 c0       	rjmp	.+2      	; 0x11a <eeprom_is_fresh+0xe>
+ 118:	90 e0       	ldi	r25, 0x00	; 0
+}
+ 11a:	89 2f       	mov	r24, r25
+ 11c:	08 95       	ret
+
+0000011e <writeConf>:
+
+void writeConf(configuration * conf)
+{
+ 11e:	cf 93       	push	r28
+ 120:	df 93       	push	r29
+ 122:	ec 01       	movw	r28, r24
+	eeprom_update_byte((uint8_t *)0,conf->loudness);
+ 124:	68 81       	ld	r22, Y
+ 126:	80 e0       	ldi	r24, 0x00	; 0
+ 128:	90 e0       	ldi	r25, 0x00	; 0
+ 12a:	72 d0       	rcall	.+228    	; 0x210 <eeprom_update_byte>
+	eeprom_update_byte((uint8_t *)1,conf->reps);
+ 12c:	69 81       	ldd	r22, Y+1	; 0x01
+ 12e:	81 e0       	ldi	r24, 0x01	; 1
+ 130:	90 e0       	ldi	r25, 0x00	; 0
+ 132:	6e d0       	rcall	.+220    	; 0x210 <eeprom_update_byte>
+	eeprom_update_byte((uint8_t *)2,conf->blinks_in_one_rep);
+ 134:	6a 81       	ldd	r22, Y+2	; 0x02
+ 136:	82 e0       	ldi	r24, 0x02	; 2
+ 138:	90 e0       	ldi	r25, 0x00	; 0
+ 13a:	6a d0       	rcall	.+212    	; 0x210 <eeprom_update_byte>
+	eeprom_update_byte((uint8_t *)3,conf->should_led_stay_on);
+ 13c:	6b 81       	ldd	r22, Y+3	; 0x03
+ 13e:	83 e0       	ldi	r24, 0x03	; 3
+ 140:	90 e0       	ldi	r25, 0x00	; 0
+ 142:	66 d0       	rcall	.+204    	; 0x210 <eeprom_update_byte>
+	eeprom_update_byte((uint8_t *)4,conf->should_buzz_every_time);
+ 144:	6c 81       	ldd	r22, Y+4	; 0x04
+ 146:	84 e0       	ldi	r24, 0x04	; 4
+ 148:	90 e0       	ldi	r25, 0x00	; 0
+ 14a:	62 d0       	rcall	.+196    	; 0x210 <eeprom_update_byte>
+	eeprom_update_byte((uint8_t *)5,0); // set a flag which signifies, that the eeprom is configured
+ 14c:	60 e0       	ldi	r22, 0x00	; 0
+ 14e:	85 e0       	ldi	r24, 0x05	; 5
+ 150:	90 e0       	ldi	r25, 0x00	; 0
+ 152:	5e d0       	rcall	.+188    	; 0x210 <eeprom_update_byte>
+}
+ 154:	df 91       	pop	r29
+ 156:	cf 91       	pop	r28
+ 158:	08 95       	ret
+
+0000015a <readConf>:
+
+
+void readConf(configuration * conf)
+{
+ 15a:	cf 93       	push	r28
+ 15c:	df 93       	push	r29
+ 15e:	ec 01       	movw	r28, r24
+	conf->loudness = eeprom_read_byte((uint8_t *)0);
+ 160:	80 e0       	ldi	r24, 0x00	; 0
+ 162:	90 e0       	ldi	r25, 0x00	; 0
+ 164:	4e d0       	rcall	.+156    	; 0x202 <eeprom_read_byte>
+ 166:	88 83       	st	Y, r24
+	conf->reps	   = eeprom_read_byte((uint8_t *)1);
+ 168:	81 e0       	ldi	r24, 0x01	; 1
+ 16a:	90 e0       	ldi	r25, 0x00	; 0
+ 16c:	4a d0       	rcall	.+148    	; 0x202 <eeprom_read_byte>
+ 16e:	89 83       	std	Y+1, r24	; 0x01
+	conf->blinks_in_one_rep = eeprom_read_byte((uint8_t *)2);
+ 170:	82 e0       	ldi	r24, 0x02	; 2
+ 172:	90 e0       	ldi	r25, 0x00	; 0
+ 174:	46 d0       	rcall	.+140    	; 0x202 <eeprom_read_byte>
+ 176:	8a 83       	std	Y+2, r24	; 0x02
+	conf->should_led_stay_on = eeprom_read_byte((uint8_t *)3);
+ 178:	83 e0       	ldi	r24, 0x03	; 3
+ 17a:	90 e0       	ldi	r25, 0x00	; 0
+ 17c:	42 d0       	rcall	.+132    	; 0x202 <eeprom_read_byte>
+ 17e:	8b 83       	std	Y+3, r24	; 0x03
+	conf->should_buzz_every_time = eeprom_read_byte((uint8_t *)4);
+ 180:	84 e0       	ldi	r24, 0x04	; 4
+ 182:	90 e0       	ldi	r25, 0x00	; 0
+ 184:	3e d0       	rcall	.+124    	; 0x202 <eeprom_read_byte>
+ 186:	8c 83       	std	Y+4, r24	; 0x04
+}
+ 188:	df 91       	pop	r29
+ 18a:	cf 91       	pop	r28
+ 18c:	08 95       	ret
+
+0000018e <set_default_config>:
+
+void set_default_config(configuration * conf)
+{
+ 18e:	fc 01       	movw	r30, r24
+	conf->blinks_in_one_rep = 3;
+ 190:	83 e0       	ldi	r24, 0x03	; 3
+ 192:	82 83       	std	Z+2, r24	; 0x02
+	conf->reps = 3;
+ 194:	81 83       	std	Z+1, r24	; 0x01
+	conf->loudness = 4;
+ 196:	84 e0       	ldi	r24, 0x04	; 4
+ 198:	80 83       	st	Z, r24
+	conf->should_led_stay_on = 1;
+ 19a:	81 e0       	ldi	r24, 0x01	; 1
+ 19c:	83 83       	std	Z+3, r24	; 0x03
+	conf->should_buzz_every_time = 0;
+ 19e:	14 82       	std	Z+4, r1	; 0x04
+ 1a0:	08 95       	ret
+
+000001a2 <main>:
+void set_default_config(configuration * conf);
+
+
+
+int main(void)
+{
+ 1a2:	cf 93       	push	r28
+ 1a4:	df 93       	push	r29
+ 1a6:	cd b7       	in	r28, 0x3d	; 61
+ 1a8:	dd 27       	eor	r29, r29
+ 1aa:	c5 50       	subi	r28, 0x05	; 5
+ 1ac:	cd bf       	out	0x3d, r28	; 61
+	initLed();
+ 1ae:	ba 9a       	sbi	0x17, 2	; 23
+	initPir();
+ 1b0:	bb 98       	cbi	0x17, 3	; 23
+	initReed();
+ 1b2:	bc 98       	cbi	0x17, 4	; 23
+	
+	configuration conf;
+
+	// read conf
+	if(eeprom_is_fresh())
+ 1b4:	ab df       	rcall	.-170    	; 0x10c <eeprom_is_fresh>
+ 1b6:	88 23       	and	r24, r24
+ 1b8:	39 f0       	breq	.+14     	; 0x1c8 <main+0x26>
+	{
+		set_default_config(&conf);
+ 1ba:	ce 01       	movw	r24, r28
+ 1bc:	01 96       	adiw	r24, 0x01	; 1
+ 1be:	e7 df       	rcall	.-50     	; 0x18e <set_default_config>
+		writeConf(&conf);
+ 1c0:	ce 01       	movw	r24, r28
+ 1c2:	01 96       	adiw	r24, 0x01	; 1
+ 1c4:	ac df       	rcall	.-168    	; 0x11e <writeConf>
+ 1c6:	03 c0       	rjmp	.+6      	; 0x1ce <main+0x2c>
+	}
+	else
+	{
+		readConf(&conf);		
+ 1c8:	ce 01       	movw	r24, r28
+ 1ca:	01 96       	adiw	r24, 0x01	; 1
+ 1cc:	c6 df       	rcall	.-116    	; 0x15a <readConf>
+	}
+
+	setBuzzerPwm(&conf);
+ 1ce:	ce 01       	movw	r24, r28
+ 1d0:	01 96       	adiw	r24, 0x01	; 1
+ 1d2:	4b df       	rcall	.-362    	; 0x6a <setBuzzerPwm>
+	
+	
+	PRR  |= (1 << PRADC); // disable adc
+ 1d4:	85 b5       	in	r24, 0x25	; 37
+ 1d6:	81 60       	ori	r24, 0x01	; 1
+ 1d8:	85 bd       	out	0x25, r24	; 37
+	ACSR |= (1 << ACD);   // disable analog comparator
+ 1da:	47 9a       	sbi	0x08, 7	; 8
+	PORTB |= (1 << PORTB0); // PB0 is floating, so pullup to save power
+ 1dc:	c0 9a       	sbi	0x18, 0	; 24
+	
+	GIMSK |= (1 << PCIE); // to detect if the kitty is close to the door
+ 1de:	8b b7       	in	r24, 0x3b	; 59
+ 1e0:	80 62       	ori	r24, 0x20	; 32
+ 1e2:	8b bf       	out	0x3b, r24	; 59
+	PCMSK |= (1 << PCINT3); 
+ 1e4:	ab 9a       	sbi	0x15, 3	; 21
+
+
+	sei();
+ 1e6:	78 94       	sei
+	
+    while (1) 
+    {
+		goToSleep();
+ 1e8:	27 df       	rcall	.-434    	; 0x38 <goToSleep>
+		if(isTheCatWaiting())
+ 1ea:	b3 9b       	sbis	0x16, 3	; 22
+ 1ec:	fd cf       	rjmp	.-6      	; 0x1e8 <main+0x46>
+ 1ee:	b4 99       	sbic	0x16, 4	; 22
+ 1f0:	fb cf       	rjmp	.-10     	; 0x1e8 <main+0x46>
+		{
+			playAlarmSequence(&conf);
+ 1f2:	ce 01       	movw	r24, r28
+ 1f4:	01 96       	adiw	r24, 0x01	; 1
+ 1f6:	40 df       	rcall	.-384    	; 0x78 <playAlarmSequence>
+			if(conf.should_led_stay_on)
+ 1f8:	8c 81       	ldd	r24, Y+4	; 0x04
+ 1fa:	88 23       	and	r24, r24
+ 1fc:	a9 f3       	breq	.-22     	; 0x1e8 <main+0x46>
+				ledOn();
+ 1fe:	c2 9a       	sbi	0x18, 2	; 24
+ 200:	f3 cf       	rjmp	.-26     	; 0x1e8 <main+0x46>
+
+00000202 <eeprom_read_byte>:
+ 202:	e1 99       	sbic	0x1c, 1	; 28
+ 204:	fe cf       	rjmp	.-4      	; 0x202 <eeprom_read_byte>
+ 206:	8e bb       	out	0x1e, r24	; 30
+ 208:	e0 9a       	sbi	0x1c, 0	; 28
+ 20a:	99 27       	eor	r25, r25
+ 20c:	8d b3       	in	r24, 0x1d	; 29
+ 20e:	08 95       	ret
+
+00000210 <eeprom_update_byte>:
+ 210:	26 2f       	mov	r18, r22
+
+00000212 <eeprom_update_r18>:
+ 212:	e1 99       	sbic	0x1c, 1	; 28
+ 214:	fe cf       	rjmp	.-4      	; 0x212 <eeprom_update_r18>
+ 216:	8e bb       	out	0x1e, r24	; 30
+ 218:	e0 9a       	sbi	0x1c, 0	; 28
+ 21a:	81 50       	subi	r24, 0x01	; 1
+ 21c:	0d b2       	in	r0, 0x1d	; 29
+ 21e:	02 16       	cp	r0, r18
+ 220:	39 f0       	breq	.+14     	; 0x230 <eeprom_update_r18+0x1e>
+ 222:	1c ba       	out	0x1c, r1	; 28
+ 224:	2d bb       	out	0x1d, r18	; 29
+ 226:	0f b6       	in	r0, 0x3f	; 63
+ 228:	f8 94       	cli
+ 22a:	e2 9a       	sbi	0x1c, 2	; 28
+ 22c:	e1 9a       	sbi	0x1c, 1	; 28
+ 22e:	0f be       	out	0x3f, r0	; 63
+ 230:	08 95       	ret
+
+00000232 <_exit>:
+ 232:	f8 94       	cli
+
+00000234 <__stop_program>:
+ 234:	ff cf       	rjmp	.-2      	; 0x234 <__stop_program>

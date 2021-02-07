@@ -1,0 +1,2 @@
+original (E:FF, H:FF, L:6A)
+new	 (E:FF, H:FF, L:7B)
