@@ -96,13 +96,14 @@ int main(void)
 		
 		if(isTheCatWaiting())
 		{
+			if(conf.should_reset_on_door_opened)
+				armOpenDoorReset();
+			
 			playAlarmSequence(&conf);
 			
 			// it's redundant to do these checks on every alarm, but it is easier that way
 			if(conf.should_led_stay_on)
 				ledOn();
-			if(conf.should_reset_on_door_opened)
-				armOpenDoorReset();
 		}
 	}
 }
